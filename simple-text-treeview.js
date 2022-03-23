@@ -82,7 +82,6 @@ simpleTextTreeviewClass.prototype = {
 				console.log("invalid top node");
 				return null;
 			}
-			insert = false;	//only append for top mode
 		}
 		else {
 			elNode = ui_model_treeview.getNode(elNode || this.selectedName);
@@ -94,6 +93,8 @@ simpleTextTreeviewClass.prototype = {
 
 		//text is array
 		if (text && (text instanceof Array)) {
+			if (top) insert = false;	//only append for top mode
+
 			var i, imax = text.length, elFirst = null, el;
 			for (i = 0; i < imax; i++) {
 				el = this.add(elNode, text[i], insert, top);
@@ -113,10 +114,10 @@ simpleTextTreeviewClass.prototype = {
 
 		//add
 		var el;
-		if (insert) {
+		if (insert && !top) {	//only append for top mode
 			//insert dom
 			el = ui_model_treeview.addNode(elNode,
-				{ contentHtml: this.formatContent(text), insert: insert }
+				{ contentHtml: this.formatContent(text), insert: true }
 			);
 			ui_model_treeview.nodeName(el).innerHTML = text;
 		}
