@@ -1,0 +1,30 @@
+{
+  "name": "simple-text-treeview",
+  "version": "0.1.1",
+  "description": "simple text treeview",
+  "main": "simple-text-treeview.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "text",
+    "treeview"
+  ],
+  "author": "fwg",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adf0001/simple-text-treeview.git"
+  },
+  "bugs": {
+    "url": "https://github.com/adf0001/simple-text-treeview/issues"
+  },
+  "homepage": "https://github.com/adf0001/simple-text-treeview#readme",
+  "dependencies": {
+    "dispatch-event-by-name": "^1.0.3",
+    "ele-id": "^1.0.2",
+    "get-element-by-id": "^1.0.2",
+    "htm-tool-css": "^1.0.6",
+    "ui-model-treeview": "^1.0.4"
+  }
+}
