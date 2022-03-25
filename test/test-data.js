@@ -12,13 +12,14 @@ module.exports = {
 			"<div id='name-click-msg' style='border:1px solid lightgrey;'>&nbsp;</div>" +
 			"<div>" +
 			"<span class='ht cmd' id='sp-cmd-add'>+add</span>/" +
-			"<span class='ht cmd' id='sp-cmd-add-2'>2</span> " +
+			"<span class='ht cmd' id='sp-cmd-add-2' title='add 2 items'>2</span> " +
 			"<span class='ht cmd' id='sp-cmd-insert'>+insert</span>/" +
-			"<span class='ht cmd' id='sp-cmd-insert-2'>2</span> " +
+			"<span class='ht cmd' id='sp-cmd-insert-2' title='insert 2 items'>2</span> " +
 			"<span class='ht cmd' id='sp-cmd-insert-next'>+insert-next</span>/" +
-			"<span class='ht cmd' id='sp-cmd-insert-next-2'>2</span> &nbsp; " +
+			"<span class='ht cmd' id='sp-cmd-insert-next-2' title='insert 2 items'>2</span> &nbsp; " +
 			"<span class='ht cmd' id='sp-cmd-remove'>-remove</span> &nbsp; " +
-			"<span class='ht cmd' id='sp-cmd-update'>=update</span> " +
+			"<span class='ht cmd' id='sp-cmd-update'>=update</span> &nbsp; " +
+			"<label><input type='checkbox' id='chk-update-select' checked/>update-select</label>" +
 			"</div>" +
 			"<div id='st-treeview'></div>";
 
@@ -37,36 +38,48 @@ module.exports = {
 		})
 
 		document.getElementById('sp-cmd-add').onclick = function () {
-			//add: function (elNode, text/textArray [, insert [, top]] )
-			//return the first added node
-			tv.add(tv.selectedName || el, "" + (new Date()), false, !tv.selectedName);
+			/*
+			add( elNode, text [, options] )
+				elNode
+					node, nodeChildren, container, NodeInfo
+				text
+					text or textArray
+				options
+					.insert
+						insert mode
+					.updateSelect
+						update selection
+						
+			return the first added node
+			*/
+			tv.add(tv.selectedName || el, "" + (new Date()), { updateSelect: _ele('chk-update-select').checked });
 		};
 		document.getElementById('sp-cmd-add-2').onclick = function () {
 			//insert array
-			tv.add(tv.selectedName || el, ["" + (new Date()), "" + (new Date()) + "/2"], false, !tv.selectedName);
+			tv.add(tv.selectedName || el, ["" + (new Date()), "" + (new Date()) + "/2"], { updateSelect: _ele('chk-update-select').checked });
 		};
 		document.getElementById('sp-cmd-insert').onclick = function () {
-			tv.add(tv.selectedName || el, "" + (new Date()), true, !tv.selectedName);
+			tv.add(tv.selectedName || el, "" + (new Date()), { insert: true, updateSelect: _ele('chk-update-select').checked });
 		};
 		document.getElementById('sp-cmd-insert-2').onclick = function () {
-			tv.add(tv.selectedName || el, ["" + (new Date()), "" + (new Date()) + "/2"], true, !tv.selectedName);
+			tv.add(tv.selectedName || el, ["" + (new Date()), "" + (new Date()) + "/2"], { insert: true, updateSelect: _ele('chk-update-select').checked });
 		};
 		document.getElementById('sp-cmd-insert-next').onclick = function () {
 			//insertNext(elNode, text)
-			if (tv.selectedName) tv.insertNext(null, "" + new Date());
-			else tv.add(el, "" + (new Date()), false, true);
+			if (tv.selectedName) tv.insertNext(null, "" + new Date(), { updateSelect: _ele('chk-update-select').checked });
+			else tv.add(el, "" + (new Date()), { updateSelect: _ele('chk-update-select').checked });
 		};
 		document.getElementById('sp-cmd-insert-next-2').onclick = function () {
-			if (tv.selectedName) tv.insertNext(null, ["" + (new Date()), "" + (new Date()) + "/2"]);
-			else tv.add(el, ["" + (new Date()), "" + (new Date()) + "/2"], false, true);
+			if (tv.selectedName) tv.insertNext(null, ["" + (new Date()), "" + (new Date()) + "/2"], { updateSelect: _ele('chk-update-select').checked });
+			else tv.add(el, ["" + (new Date()), "" + (new Date()) + "/2"], { updateSelect: _ele('chk-update-select').checked });
 		};
 		document.getElementById('sp-cmd-remove').onclick = function () {
 			//remove(elNode)
-			tv.remove();	//remove the selected
+			tv.remove(null, { updateSelect: _ele('chk-update-select').checked });	//remove the selected
 		};
 		document.getElementById('sp-cmd-update').onclick = function () {
 			//update(elNode, text)
-			tv.update(null, "" + (new Date()));	//update the selected
+			tv.update(null, "" + (new Date()), { updateSelect: _ele('chk-update-select').checked });	//update the selected
 		};
 
 		return "ui-test";

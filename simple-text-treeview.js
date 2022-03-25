@@ -8,11 +8,18 @@ var dispatch_event_by_name = require("dispatch-event-by-name");
 
 var htCss = require("htm-tool-css");	//require ht css
 
+var INDEX_INFO_NODE = 0;
+var INDEX_INFO_CHILDREN = 1;
+var INDEX_INFO_CONTAINER = 2;
+
 var simpleTextTreeviewClass = function (container) {
 	this.init(container);
 }
 
 simpleTextTreeviewClass.prototype = {
+	INDEX_INFO_NODE: INDEX_INFO_NODE,
+	INDEX_INFO_CHILDREN: INDEX_INFO_CHILDREN,
+	INDEX_INFO_CONTAINER: INDEX_INFO_CONTAINER,
 
 	containerId: null,
 	selectedName: null,		//the selected node name
@@ -24,11 +31,11 @@ simpleTextTreeviewClass.prototype = {
 		container.onclick = this._onClick || (this._onClick = this.onClick.bind(this));
 	},
 
-	clickName: function (el) {
-		dispatch_event_by_name.click(ui_model_treeview.nodeName(el));
+	clickName: function (el, delay) {
+		dispatch_event_by_name.click(ui_model_treeview.nodeName(el), delay);
 	},
-	clickToExpand: function (el) {
-		dispatch_event_by_name.click(ui_model_treeview.nodeToExpand(el));
+	clickToExpand: function (el, delay) {
+		dispatch_event_by_name.click(ui_model_treeview.nodeToExpand(el), delay);
 	},
 
 	onClick: function (evt) {
@@ -59,7 +66,7 @@ simpleTextTreeviewClass.prototype = {
 	formatContent: function (name, hasChildren) {
 		var a = [];
 
-		a[a.length] = "<span class='ht tree-to-expand" + (hasChildren ? " cmd" : " disabled") + "'" +
+		a[a.length] = "<span class='ht tree-to-expand" + (hasChildren ? " cmd" : " tree-disable") + "'" +
 			" style='padding:0em 0.5em;text-decoration:none;font-family:monospace;font-size:9pt;cursor:default;'>" +
 			(hasChildren ? "+" : ".") +
 			"</span>";
@@ -71,40 +78,70 @@ simpleTextTreeviewClass.prototype = {
 
 	//operation
 
-	//add: function (elNode, text/textArray [, insert [, top]] )
-	//return the first added node
-	add: function (elNode, text, insert, top) {
-		//arguments
+	//return a NodeInfo, that is, [ elNode, isNodeChildren, isContainer ]
+	getNodeInfo: function (elNode) {
+		if (!elNode) elNode = this.selectedName;
+		else if (elNode instanceof Array) return elNode;		//already a NodeInfo
+		else elNode = ele(elNode);	//ensure an dom element
 
-		//node
-		if (top) {
-			if (!elNode || elNode.id != this.containerId) {
-				console.log("invalid top node");
-				return null;
-			}
+		if (elNode) {
+			if (elNode.id === this.containerId) return [elNode, true, true];
+			if (elNode.classList.contains("tree-children")) return [elNode, true];
+
+			elNode = ui_model_treeview.getNode(elNode);
 		}
-		else {
-			elNode = ui_model_treeview.getNode(elNode || this.selectedName);
-			if (!elNode) {
-				console.log("invalid node");
-				return null;
-			}
+
+		if (!elNode) {
+			console.log("invalid node");
+			return null;
 		}
+		return [elNode];
+	},
+
+	/*
+	add( elNode, text [, options] )
+		elNode
+			node, nodeChildren, container, NodeInfo
+		text
+			text or textArray
+		options
+			.insert
+				insert mode
+			.updateSelect
+				update selection
+				
+	return the first added node
+	*/
+	add: function (elNode, text, options) {
+		//arguments
+		var nodeInfo = this.getNodeInfo(elNode);
+		if (!nodeInfo) return null;
+
+		elNode = nodeInfo[INDEX_INFO_NODE];
+		var isNodeChildren = nodeInfo[INDEX_INFO_CHILDREN];
+		var isTop = nodeInfo[INDEX_INFO_CONTAINER];
+
+		//options
+		options = options ? Object.create(options) : {};
+		options.insert = options.insert && !isNodeChildren;	//only append for node children
 
 		//text is array
 		if (text && (text instanceof Array)) {
-			if (top) insert = false;	//only append for top mode
+			var i, imax = text.length, elFirst = null, elNew;
 
-			var i, imax = text.length, elFirst = null, el;
+			var updateLast = options.updateSelect;
+			options.updateSelect = false;		//stop updating selection
+
 			for (i = 0; i < imax; i++) {
-				el = this.add(elNode, text[i], insert, top);
-				if (!el) {
+				elNew = this.add(nodeInfo, text[i], options);
+				if (!elNew) {
 					console.warn("add text array return null");
 					return elFirst;
 				}
-				if (!elFirst) elFirst = el;
+				if (!elFirst) elFirst = elNew;
 			}
-			return elFirst;
+			if (updateLast && elNew) this.clickName(elNew);	//select the last
+			return elFirst;		//return the first
 		}
 
 		if (typeof text !== "string") {
@@ -113,106 +150,135 @@ simpleTextTreeviewClass.prototype = {
 		}
 
 		//add
-		var el;
-		if (insert && !top) {	//only append for top mode
+
+		var elNew;
+		if (options.insert) {
 			//insert dom
-			el = ui_model_treeview.addNode(elNode,
+			elNew = ui_model_treeview.addNode(elNode,
 				{ contentHtml: this.formatContent(text), insert: true }
 			);
-			ui_model_treeview.nodeName(el).innerHTML = text;
+			ui_model_treeview.nodeName(elNew).innerHTML = text;
 		}
 		else {
 			//append to children
 
 			//expand existed
-			if (!top && ui_model_treeview.getToExpandState(elNode) === true) {
+			if (!isNodeChildren && ui_model_treeview.getToExpandState(elNode) === true) {
 				this.clickToExpand(elNode);
 			}
 
 			//append dom
-			el = ui_model_treeview.addNode(elNode,
+			elNew = ui_model_treeview.addNode(elNode,
 				{ contentHtml: this.formatContent(text) },
-				top		//container for top
+				isNodeChildren
 			);
-			ui_model_treeview.nodeName(el).innerHTML = text;
+			ui_model_treeview.nodeName(elNew).innerHTML = text;
 
-			if (!top) {
+			if (!isTop) {
 				//children state
-				ui_model_treeview.setToExpandState(elNode, false);		//set icon to '-'
-				ui_model_treeview.nodeToExpand(elNode).classList.add("cmd");	//cursor & cmd
-				ui_model_treeview.nodeChildren(elNode).style.display = "";	//expand hidden
+				ui_model_treeview.setToExpandState(elNew.parentNode, false);		//set icon to '-'
+				htCss.add(ui_model_treeview.nodeToExpand(elNew.parentNode), "cmd");	//cursor & cmd
+				ui_model_treeview.nodeChildren(elNew.parentNode).style.display = "";	//expand hidden
 			}
 		}
 
 		//select the new created
-		this.clickName(el);
+		if (options.updateSelect) this.clickName(elNew);
 
-		return el;
+		return elNew;
 	},
 
-	insertNext: function (elNode, text) {
-		elNode = ui_model_treeview.getNode(elNode || this.selectedName);
-		if (!elNode) {
-			console.log("invalid node");
-			return null;
-		}
+	insertNext: function (elNode, text, options) {
+		//arguments
+		var nodeInfo = this.getNodeInfo(elNode);
+		if (!nodeInfo) return null;
 
-		if (elNode.nextSibling) return this.add(elNode.nextSibling, text, true);
-		else return this.add(elNode.parentNode, text, false, elNode.parentNode.id == this.containerId);
+		elNode = nodeInfo[INDEX_INFO_NODE];
+
+		//options
+		options = options ? Object.create(options) : {};
+		options.insert = !!elNode.nextSibling;
+
+		return this.add(elNode.nextSibling || elNode.parentNode, text, options);
 	},
 
-	remove: function (elNode) {
-		elNode = ui_model_treeview.getNode(elNode || this.selectedName);
-		if (!elNode) {
-			console.log("invalid node");
-			return;
-		}
+	//return true if finished
+	remove: function (elNode, options) {
+		//arguments
+		var nodeInfo = this.getNodeInfo(elNode);
+		if (!nodeInfo || nodeInfo[INDEX_INFO_CHILDREN] || nodeInfo[INDEX_INFO_CONTAINER]) return null;
+
+		elNode = nodeInfo[INDEX_INFO_NODE];
+
+		var selectedRemoved = this.selectedName && elNode.contains(this.selectedName);
 
 		//prepare next selected
 		var elSelect = elNode.nextSibling || elNode.previousSibling;
-		var elParent = elSelect ? null : elNode.parentNode;
-		var isTop = elParent && elParent.id == this.containerId;
+		var elParent = elSelect ? null : elNode.parentNode;		//empty child node after removing
+		var isParentTop = elParent && elParent.id == this.containerId;
 
 		//remove dom
 		elNode.parentNode.removeChild(elNode);
 
-		//select next
-		if (elSelect) this.clickName(elSelect);
-		else {
-			if (!isTop) {
-				elParent = ui_model_treeview.getNode(elParent);
+		//update parent empty children state
+		if (elParent && !isParentTop) {
+			elParent = ui_model_treeview.getNode(elParent);
 
-				this.clickName(elParent);
+			ui_model_treeview.setToExpandState(elParent, "tree-disable");
+			ui_model_treeview.nodeToExpand(elParent).classList.remove("cmd");
+			ui_model_treeview.nodeChildren(elParent).style.display = "none";
 
-				//children state
-				ui_model_treeview.setToExpandState(elParent, "disable");
-				ui_model_treeview.nodeToExpand(elParent).classList.remove("cmd");
-				ui_model_treeview.nodeChildren(elParent).style.display = "none";
-			}
-			else {
-				this.selectedName = null;	//top data empty
-			}
+			//remove empty parent children
+			var elChildren = ui_model_treeview.nodeChildren(elParent);
+			elChildren.parentNode.removeChild(elChildren);
 		}
 
+		if (!selectedRemoved) return true;	//don't touch selected even options.updateSelect is true
+
+		if (!options || !options.updateSelect) {
+			this.selectedName = null;	//just clean selected
+			return true;
+		}
+
+		//select next
+		if (elSelect) {
+			this.clickName(elSelect);
+			return true;
+		}
+
+		//unselect for top
+		if (isParentTop) {
+			this.selectedName = null;	//just clean selected for top
+			return true;
+		}
+
+		//select parent
+		elParent = ui_model_treeview.getNode(elParent);
+
+		this.clickName(elParent);
+
+		return true;
 	},
 
-	update: function (elNode, text) {
+	//return the updated node
+	update: function (elNode, text, options) {
 		//arguments
+		var nodeInfo = this.getNodeInfo(elNode);
+		if (!nodeInfo || nodeInfo[INDEX_INFO_CHILDREN] || nodeInfo[INDEX_INFO_CONTAINER]) return null;
+
+		elNode = nodeInfo[INDEX_INFO_NODE];
+
 		if (typeof text !== "string") {
 			console.log("invalid data", text);
 			return null;
 		}
 
-		elNode = ui_model_treeview.getNode(elNode || this.selectedName);
-		if (!elNode) {
-			console.log("invalid node");
-			return;
-		}
-
 		//update
 		ui_model_treeview.nodeName(elNode).innerHTML = text;
 
-		this.clickName(elNode);
+		if (options && options.updateSelect) this.clickName(elNode);
+
+		return elNode;
 	},
 
 };

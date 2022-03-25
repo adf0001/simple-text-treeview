@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/adf0001/simple-text-treeview#readme",
   "dependencies": {
-    "dispatch-event-by-name": "^1.0.3",
+    "dispatch-event-by-name": "^1.0.4",
     "ele-id": "^1.0.2",
     "get-element-by-id": "^1.0.2",
     "htm-tool-css": "^1.0.6",
