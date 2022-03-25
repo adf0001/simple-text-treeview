@@ -109,6 +109,8 @@ simpleTextTreeviewClass.prototype = {
 				insert mode
 			.updateSelect
 				update selection
+			.html
+				text is html
 				
 	return the first added node
 	*/
@@ -157,7 +159,10 @@ simpleTextTreeviewClass.prototype = {
 			elNew = ui_model_treeview.addNode(elNode,
 				{ contentHtml: this.formatContent(text), insert: true }
 			);
-			ui_model_treeview.nodeName(elNew).innerHTML = text;
+			if (options && options.html)
+				ui_model_treeview.nodeName(elNew).innerHTML = text;
+			else
+				ui_model_treeview.nodeName(elNew).textContent = text;
 		}
 		else {
 			//append to children
@@ -172,7 +177,10 @@ simpleTextTreeviewClass.prototype = {
 				{ contentHtml: this.formatContent(text) },
 				isNodeChildren
 			);
-			ui_model_treeview.nodeName(elNew).innerHTML = text;
+			if (options && options.html)
+				ui_model_treeview.nodeName(elNew).innerHTML = text;
+			else
+				ui_model_treeview.nodeName(elNew).textContent = text;
 
 			if (!isTop) {
 				//children state
@@ -202,6 +210,18 @@ simpleTextTreeviewClass.prototype = {
 		return this.add(elNode.nextSibling || elNode.parentNode, text, options);
 	},
 
+	//return false to keep the selected, null or node to change.
+	prepareRemoveSelect: function (elNode) {
+		if (!this.selectedName) return false;
+		if (!elNode.contains(this.selectedName)) return false;	//don't touch selected even .updateSelect is true
+
+		if (elNode.nextSibling) return elNode.nextSibling;
+		if (elNode.previousSibling) return elNode.previousSibling;
+		elNode = elNode.parentNode;
+		if (elNode.id == this.containerId) return null;
+		return ui_model_treeview.getNode(elNode);
+	},
+
 	//return true if finished
 	remove: function (elNode, options) {
 		//arguments
@@ -210,52 +230,30 @@ simpleTextTreeviewClass.prototype = {
 
 		elNode = nodeInfo[INDEX_INFO_NODE];
 
-		var selectedRemoved = this.selectedName && elNode.contains(this.selectedName);
-
 		//prepare next selected
-		var elSelect = elNode.nextSibling || elNode.previousSibling;
-		var elParent = elSelect ? null : elNode.parentNode;		//empty child node after removing
-		var isParentTop = elParent && elParent.id == this.containerId;
+		var elSelect = this.prepareRemoveSelect(elNode);
+		var elParent = elNode.parentNode;
 
 		//remove dom
 		elNode.parentNode.removeChild(elNode);
 
 		//update parent empty children state
-		if (elParent && !isParentTop) {
+		if (elParent && !elParent.hasChildNodes() && elParent.id !== this.containerId) {
 			elParent = ui_model_treeview.getNode(elParent);
 
-			ui_model_treeview.setToExpandState(elParent, "tree-disable");
+			ui_model_treeview.setToExpandState(elParent, "disable");
 			ui_model_treeview.nodeToExpand(elParent).classList.remove("cmd");
-			ui_model_treeview.nodeChildren(elParent).style.display = "none";
+			//ui_model_treeview.nodeChildren(elParent).style.display = "none";
 
 			//remove empty parent children
 			var elChildren = ui_model_treeview.nodeChildren(elParent);
 			elChildren.parentNode.removeChild(elChildren);
 		}
 
-		if (!selectedRemoved) return true;	//don't touch selected even options.updateSelect is true
-
-		if (!options || !options.updateSelect) {
-			this.selectedName = null;	//just clean selected
-			return true;
+		if (options && options.updateSelect) {
+			if (elSelect) this.clickName(elSelect);
+			else if (elSelect === null) this.selectedName = null;	//just clean selected
 		}
-
-		//select next
-		if (elSelect) {
-			this.clickName(elSelect);
-			return true;
-		}
-
-		//unselect for top
-		if (isParentTop) {
-			this.selectedName = null;	//just clean selected for top
-			return true;
-		}
-
-		//select parent
-		elParent = ui_model_treeview.getNode(elParent);
-
-		this.clickName(elParent);
 
 		return true;
 	},
@@ -274,7 +272,11 @@ simpleTextTreeviewClass.prototype = {
 		}
 
 		//update
-		ui_model_treeview.nodeName(elNode).innerHTML = text;
+		if (options && options.html)
+			ui_model_treeview.nodeName(elNode).innerHTML = text;
+		else
+			ui_model_treeview.nodeName(elNode).textContent = text;
+
 
 		if (options && options.updateSelect) this.clickName(elNode);
 

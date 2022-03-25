@@ -52,26 +52,34 @@ module.exports = {
 						
 			return the first added node
 			*/
-			tv.add(tv.selectedName || el, "" + (new Date()), { updateSelect: _ele('chk-update-select').checked });
+			tv.add(tv.selectedName || el, "" + (new Date()),
+				{ updateSelect: _ele('chk-update-select').checked });
 		};
 		document.getElementById('sp-cmd-add-2').onclick = function () {
 			//insert array
-			tv.add(tv.selectedName || el, ["" + (new Date()), "" + (new Date()) + "/2"], { updateSelect: _ele('chk-update-select').checked });
+			tv.add(tv.selectedName || el, ["" + (new Date()), "" + (new Date()) + "/<b>2</b>"],
+				{ updateSelect: _ele('chk-update-select').checked, html: true });
 		};
 		document.getElementById('sp-cmd-insert').onclick = function () {
-			tv.add(tv.selectedName || el, "" + (new Date()), { insert: true, updateSelect: _ele('chk-update-select').checked });
+			tv.add(tv.selectedName || el, "" + (new Date()),
+				{ insert: true, updateSelect: _ele('chk-update-select').checked });
 		};
 		document.getElementById('sp-cmd-insert-2').onclick = function () {
-			tv.add(tv.selectedName || el, ["" + (new Date()), "" + (new Date()) + "/2"], { insert: true, updateSelect: _ele('chk-update-select').checked });
+			tv.add(tv.selectedName || el, ["" + (new Date()), "" + (new Date()) + "/<b>2</b>"],
+				{ insert: true, updateSelect: _ele('chk-update-select').checked });
 		};
 		document.getElementById('sp-cmd-insert-next').onclick = function () {
 			//insertNext(elNode, text)
-			if (tv.selectedName) tv.insertNext(null, "" + new Date(), { updateSelect: _ele('chk-update-select').checked });
-			else tv.add(el, "" + (new Date()), { updateSelect: _ele('chk-update-select').checked });
+			if (tv.selectedName) tv.insertNext(null, "" + new Date(),
+				{ updateSelect: _ele('chk-update-select').checked });
+			else tv.add(el, "" + (new Date()),
+				{ updateSelect: _ele('chk-update-select').checked });
 		};
 		document.getElementById('sp-cmd-insert-next-2').onclick = function () {
-			if (tv.selectedName) tv.insertNext(null, ["" + (new Date()), "" + (new Date()) + "/2"], { updateSelect: _ele('chk-update-select').checked });
-			else tv.add(el, ["" + (new Date()), "" + (new Date()) + "/2"], { updateSelect: _ele('chk-update-select').checked });
+			if (tv.selectedName) tv.insertNext(null, ["" + (new Date()), "" + (new Date()) + "/2"],
+				{ updateSelect: _ele('chk-update-select').checked });
+			else tv.add(el, ["" + (new Date()), "" + (new Date()) + "/2"],
+				{ updateSelect: _ele('chk-update-select').checked });
 		};
 		document.getElementById('sp-cmd-remove').onclick = function () {
 			//remove(elNode)
