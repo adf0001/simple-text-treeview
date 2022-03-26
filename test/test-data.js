@@ -49,6 +49,8 @@ module.exports = {
 						insert mode
 					.updateSelect
 						update selection
+					.html
+						text is html
 						
 			return the first added node
 			*/
@@ -69,7 +71,7 @@ module.exports = {
 				{ insert: true, updateSelect: _ele('chk-update-select').checked });
 		};
 		document.getElementById('sp-cmd-insert-next').onclick = function () {
-			//insertNext(elNode, text)
+			//insertNext(elNode, text, options)
 			if (tv.selectedName) tv.insertNext(null, "" + new Date(),
 				{ updateSelect: _ele('chk-update-select').checked });
 			else tv.add(el, "" + (new Date()),
@@ -82,11 +84,11 @@ module.exports = {
 				{ updateSelect: _ele('chk-update-select').checked });
 		};
 		document.getElementById('sp-cmd-remove').onclick = function () {
-			//remove(elNode)
+			//remove(elNode, options)
 			tv.remove(null, { updateSelect: _ele('chk-update-select').checked });	//remove the selected
 		};
 		document.getElementById('sp-cmd-update').onclick = function () {
-			//update(elNode, text)
+			//update(elNode, text, options)
 			tv.update(null, "" + (new Date()), { updateSelect: _ele('chk-update-select').checked });	//update the selected
 		};
 
