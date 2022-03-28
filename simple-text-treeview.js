@@ -225,6 +225,17 @@ simpleTextTreeviewClass.prototype = {
 		return ui_model_treeview.getNode(elNodeOrChildren);
 	},
 
+	updateRemoveSelect: function (elSelect, updateSelect) {
+		//update select state
+		if (updateSelect) {
+			if (elSelect) this.clickName(elSelect);
+			else if (elSelect === null) this.selectedName = null;	//clean the selected
+		}
+		else {
+			if (elSelect !== false) this.selectedName = null;	//clean the selected
+		}
+	},
+
 	//return true if finished
 	//options.onlyChildren:	set true for removing only the children, not the elNode itself;
 	remove: function (elNode, options) {
@@ -271,13 +282,7 @@ simpleTextTreeviewClass.prototype = {
 		}
 
 		//update select state
-		if (options && options.updateSelect) {
-			if (elSelect) this.clickName(elSelect);
-			else if (elSelect === null) this.selectedName = null;	//clean the selected
-		}
-		else {
-			if (elSelect !== false) this.selectedName = null;	//clean the selected
-		}
+		this.updateRemoveSelect(elSelect, options.updateSelect);
 
 		return true;
 	},
