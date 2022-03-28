@@ -18,6 +18,7 @@ module.exports = {
 			"<span class='ht cmd' id='sp-cmd-insert-next'>+insert-next</span>/" +
 			"<span class='ht cmd' id='sp-cmd-insert-next-2' title='insert 2 items'>2</span> &nbsp; " +
 			"<span class='ht cmd' id='sp-cmd-remove'>-remove</span> &nbsp; " +
+			"<span class='ht cmd' id='sp-cmd-remove-children'>-remove children</span> &nbsp; " +
 			"<span class='ht cmd' id='sp-cmd-update'>=update</span> &nbsp; " +
 			"<label><input type='checkbox' id='chk-update-select' checked/>update-select</label>" +
 			"</div>" +
@@ -86,6 +87,10 @@ module.exports = {
 		document.getElementById('sp-cmd-remove').onclick = function () {
 			//remove(elNode, options)
 			tv.remove(null, { updateSelect: _ele('chk-update-select').checked });	//remove the selected
+		};
+		document.getElementById('sp-cmd-remove-children').onclick = function () {
+			//removeAllChildren(elNode, options)
+			tv.removeAllChildren(null, { updateSelect: _ele('chk-update-select').checked });	//remove all children of the selected
 		};
 		document.getElementById('sp-cmd-update').onclick = function () {
 			//update(elNode, text, options)

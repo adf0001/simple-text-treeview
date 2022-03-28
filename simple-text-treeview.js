@@ -211,31 +211,51 @@ simpleTextTreeviewClass.prototype = {
 	},
 
 	//return false to keep the selected, null or node to change.
-	prepareRemoveSelect: function (elNode) {
+	prepareRemoveSelect: function (elNodeOrChildren, onlyChildren) {
 		if (!this.selectedName) return false;
-		if (!elNode.contains(this.selectedName)) return false;	//don't touch selected even .updateSelect is true
+		if (!elNodeOrChildren.contains(this.selectedName)) return false;	//don't touch selected even .updateSelect is true
 
-		if (elNode.nextSibling) return elNode.nextSibling;
-		if (elNode.previousSibling) return elNode.previousSibling;
-		elNode = elNode.parentNode;
-		if (elNode.id == this.containerId) return null;
-		return ui_model_treeview.getNode(elNode);
+		if (!onlyChildren) {
+			elNodeOrChildren = ui_model_treeview.getNode(elNodeOrChildren);
+			if (elNodeOrChildren.nextSibling) return elNodeOrChildren.nextSibling;
+			if (elNodeOrChildren.previousSibling) return elNodeOrChildren.previousSibling;
+			elNodeOrChildren = elNodeOrChildren.parentNode;
+		}
+		if (elNodeOrChildren.id == this.containerId) return null;
+		return ui_model_treeview.getNode(elNodeOrChildren);
 	},
 
 	//return true if finished
+	//options.onlyChildren:	set true for removing only the children, not the elNode itself;
 	remove: function (elNode, options) {
 		//arguments
+		var onlyChildren = options && options.onlyChildren;
+
 		var nodeInfo = this.getNodeInfo(elNode);
-		if (!nodeInfo || nodeInfo[INDEX_INFO_CHILDREN] || nodeInfo[INDEX_INFO_CONTAINER]) return null;
+		if (!nodeInfo) return null;
+		if (nodeInfo[INDEX_INFO_CHILDREN] && !onlyChildren) return null;
 
 		elNode = nodeInfo[INDEX_INFO_NODE];
 
 		//prepare next selected
-		var elSelect = this.prepareRemoveSelect(elNode);
-		var elParent = elNode.parentNode;
+		var elSelect = this.prepareRemoveSelect(elNode, onlyChildren);
 
-		//remove dom
-		elNode.parentNode.removeChild(elNode);
+		var elParent;
+		if (onlyChildren) {
+			var elParent = (nodeInfo[INDEX_INFO_CHILDREN]) ? elNode : ui_model_treeview.nodeChildren(elNode);
+			if (!elParent) return null;
+
+			//remove dom childrens
+			elParent.innerHTML = "";
+		}
+		else {
+			elNode = ui_model_treeview.getNode(elNode);
+			if (!elNode) return null;
+			elParent = elNode.parentNode;
+
+			//remove dom
+			elParent.removeChild(elNode);
+		}
 
 		//update parent empty children state
 		if (elParent && !elParent.hasChildNodes() && elParent.id !== this.containerId) {
@@ -250,12 +270,24 @@ simpleTextTreeviewClass.prototype = {
 			elChildren.parentNode.removeChild(elChildren);
 		}
 
+		//update select state
 		if (options && options.updateSelect) {
 			if (elSelect) this.clickName(elSelect);
-			else if (elSelect === null) this.selectedName = null;	//just clean selected
+			else if (elSelect === null) this.selectedName = null;	//clean the selected
+		}
+		else {
+			if (elSelect !== false) this.selectedName = null;	//clean the selected
 		}
 
 		return true;
+	},
+
+	//return true if finished
+	removeAllChildren: function (elNode, options) {
+		options = options ? Object.create(options) : {};
+		options.onlyChildren = true;
+
+		return this.remove(elNode, options)
 	},
 
 	//return the updated node
