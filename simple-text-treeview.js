@@ -131,7 +131,7 @@ simpleTextTreeviewClass.prototype = {
 		if (text && (text instanceof Array)) {
 			var i, imax = text.length, elFirst = null, elNew;
 
-			var updateLast = options.updateSelect;
+			var updateSelect = options.updateSelect;
 			options.updateSelect = false;		//stop updating selection
 
 			for (i = 0; i < imax; i++) {
@@ -142,7 +142,7 @@ simpleTextTreeviewClass.prototype = {
 				}
 				if (!elFirst) elFirst = elNew;
 			}
-			if (updateLast && elNew) this.clickName(elNew);	//select the last
+			if (updateSelect && elFirst) this.clickName(elFirst);	//select the first
 			return elFirst;		//return the first
 		}
 
