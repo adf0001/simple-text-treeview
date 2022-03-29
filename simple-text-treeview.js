@@ -51,8 +51,7 @@ simpleTextTreeviewClass.prototype = {
 			if (elChildren && elChildren.hasChildNodes()) {
 				var toShow = (elChildren.style.display == "none");
 
-				ui_model_treeview.setToExpandState(el.parentNode, toShow ? false : true);
-				elChildren.style.display = toShow ? "" : "none";
+				this.updateToExpand(el.parentNode, toShow ? false : true);
 
 				if (!toShow && this.selectedName && elChildren.contains(this.selectedName)) {
 					//un-select hidden node, and select current
@@ -96,6 +95,23 @@ simpleTextTreeviewClass.prototype = {
 			return null;
 		}
 		return [elNode];
+	},
+
+	updateToExpand: function (elNode, state) {
+		elNode = ui_model_treeview.getNode(elNode);
+		ui_model_treeview.setToExpandState(elNode, state);
+
+		var el = ui_model_treeview.nodeToExpand(elNode);
+		(state === "disable") ? htCss.remove(el, "cmd") : htCss.add(el, "cmd");
+
+		if (state === "disable" || !state) {	//state is false or disable
+			el = ui_model_treeview.nodeChildren(elNode);
+			if (el) el.style.display = "";
+		}
+		else {	//state is true
+			el = ui_model_treeview.nodeChildren(elNode, true);
+			el.style.display = "none";
+		}
 	},
 
 	/*
@@ -184,9 +200,7 @@ simpleTextTreeviewClass.prototype = {
 
 			if (!isTop) {
 				//children state
-				ui_model_treeview.setToExpandState(elNew.parentNode, false);		//set icon to '-'
-				htCss.add(ui_model_treeview.nodeToExpand(elNew.parentNode), "cmd");	//cursor & cmd
-				ui_model_treeview.nodeChildren(elNew.parentNode).style.display = "";	//expand hidden
+				this.updateToExpand(elNew.parentNode, false);
 			}
 		}
 
@@ -222,7 +236,10 @@ simpleTextTreeviewClass.prototype = {
 			elNodeOrChildren = elNodeOrChildren.parentNode;
 		}
 		if (elNodeOrChildren.id == this.containerId) return null;
-		return ui_model_treeview.getNode(elNodeOrChildren);
+
+		elNodeOrChildren = ui_model_treeview.getNode(elNodeOrChildren);
+		if (this.selectedName === ui_model_treeview.nodeName(elNodeOrChildren)) return false;	//unchanged
+		return elNodeOrChildren;
 	},
 
 	updateRemoveSelect: function (elSelect, updateSelect) {
@@ -272,9 +289,7 @@ simpleTextTreeviewClass.prototype = {
 		if (elParent && !elParent.hasChildNodes() && elParent.id !== this.containerId) {
 			elParent = ui_model_treeview.getNode(elParent);
 
-			ui_model_treeview.setToExpandState(elParent, "disable");
-			ui_model_treeview.nodeToExpand(elParent).classList.remove("cmd");
-			//ui_model_treeview.nodeChildren(elParent).style.display = "none";
+			this.updateToExpand(elParent, "disable");
 
 			//remove empty parent children
 			var elChildren = ui_model_treeview.nodeChildren(elParent);
