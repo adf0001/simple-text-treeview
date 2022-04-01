@@ -94,7 +94,7 @@ module.exports = {
 		};
 		document.getElementById('sp-cmd-update').onclick = function () {
 			//update(elNode, text, options)
-			tv.update(null, "" + (new Date()), { updateSelect: _ele('chk-update-select').checked });	//update the selected
+			tv.update(tv.getSelected(), "" + (new Date()), { updateSelect: _ele('chk-update-select').checked });	//update the selected
 		};
 
 		return "ui-test";

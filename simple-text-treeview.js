@@ -40,6 +40,10 @@ simpleTextTreeviewClass.prototype = {
 		dispatch_event_by_name.click(ui_model_treeview.nodeToExpand(el), delay);
 	},
 
+	getSelected: function () {
+		return this.selectedName && ui_model_treeview.getNode(this.selectedName);
+	},
+
 	onClick: function (evt) {
 		var el = evt.target;
 
