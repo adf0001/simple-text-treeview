@@ -1,6 +1,6 @@
 {
   "name": "simple-text-treeview",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "simple text treeview",
   "main": "simple-text-treeview.js",
   "scripts": {

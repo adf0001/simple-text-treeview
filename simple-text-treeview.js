@@ -12,6 +12,12 @@ var INDEX_INFO_NODE = 0;
 var INDEX_INFO_CHILDREN = 1;
 var INDEX_INFO_CONTAINER = 2;
 
+var DEFAULT_NODE_CONTENT_HTML = "<span class='ht tree-to-expand tree-disable'" +
+	" style='padding:0em 0.5em;text-decoration:none;font-family:monospace;cursor:default;'>" +
+	"." +
+	"</span>" +
+	"<span class='tree-name'></span>";
+
 var simpleTextTreeviewClass = function (container) {
 	this.init(container);
 }
@@ -57,19 +63,6 @@ simpleTextTreeviewClass.prototype = {
 		}
 	},
 	_onClick: null,	//binding this
-
-	formatContent: function (name, hasChildren) {
-		var a = [];
-
-		a[a.length] = "<span class='ht tree-to-expand" + (hasChildren ? " cmd" : " tree-disable") + "'" +
-			" style='padding:0em 0.5em;text-decoration:none;font-family:monospace;font-size:9pt;cursor:default;'>" +
-			(hasChildren ? "+" : ".") +
-			"</span>";
-
-		a[a.length] = "<span class='tree-name'>" + /*name +*/ "</span>";	//to avoid bad html format
-
-		return a.join("");
-	},
 
 	//operation
 
@@ -123,6 +116,8 @@ simpleTextTreeviewClass.prototype = {
 				update selection
 			.html
 				text is html
+			.contentHtml
+				content-html to create node, default DEFAULT_NODE_CONTENT_HTML
 				
 	return the first added node
 	*/
@@ -169,7 +164,7 @@ simpleTextTreeviewClass.prototype = {
 		if (options.insert) {
 			//insert dom
 			elNew = ui_model_treeview.addNode(elNode,
-				{ contentHtml: this.formatContent(text), insert: true }
+				{ contentHtml: options.contentHtml || DEFAULT_NODE_CONTENT_HTML, insert: true }
 			);
 			if (options && options.html)
 				ui_model_treeview.nodeName(elNew).innerHTML = text;
@@ -186,7 +181,7 @@ simpleTextTreeviewClass.prototype = {
 
 			//append dom
 			elNew = ui_model_treeview.addNode(elNode,
-				{ contentHtml: this.formatContent(text) },
+				{ contentHtml: options.contentHtml || DEFAULT_NODE_CONTENT_HTML },
 				isNodeChildren
 			);
 			if (options && options.html)
@@ -337,5 +332,7 @@ simpleTextTreeviewClass.prototype = {
 exports.INDEX_INFO_NODE = INDEX_INFO_NODE;
 exports.INDEX_INFO_CHILDREN = INDEX_INFO_CHILDREN;
 exports.INDEX_INFO_CONTAINER = INDEX_INFO_CONTAINER;
+
+exports.DEFAULT_NODE_CONTENT_HTML = DEFAULT_NODE_CONTENT_HTML;
 
 exports.class = simpleTextTreeviewClass
