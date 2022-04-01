@@ -17,10 +17,6 @@ var simpleTextTreeviewClass = function (container) {
 }
 
 simpleTextTreeviewClass.prototype = {
-	INDEX_INFO_NODE: INDEX_INFO_NODE,
-	INDEX_INFO_CHILDREN: INDEX_INFO_CHILDREN,
-	INDEX_INFO_CONTAINER: INDEX_INFO_CONTAINER,
-
 	containerId: null,
 	selectedName: null,		//the selected node name
 
@@ -338,5 +334,8 @@ simpleTextTreeviewClass.prototype = {
 };
 
 //module
+exports.INDEX_INFO_NODE = INDEX_INFO_NODE;
+exports.INDEX_INFO_CHILDREN = INDEX_INFO_CHILDREN;
+exports.INDEX_INFO_CONTAINER = INDEX_INFO_CONTAINER;
 
 exports.class = simpleTextTreeviewClass
