@@ -13,7 +13,7 @@ var INDEX_INFO_CHILDREN = 1;
 var INDEX_INFO_CONTAINER = 2;
 
 var DEFAULT_NODE_CONTENT_HTML = "<span class='ht tree-to-expand tree-disable'" +
-	" style='padding:0em 0.5em;text-decoration:none;font-family:monospace;cursor:default;'>" +
+	" style='padding:0em 0.5em;text-decoration:none;font-family:monospace;cursor:default;font-size:inherit;'>" +
 	"." +
 	"</span>" +
 	"<span class='tree-name'></span>";

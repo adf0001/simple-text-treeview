@@ -22,7 +22,7 @@ module.exports = {
 			"<span class='ht cmd' id='sp-cmd-update'>=update</span> &nbsp; " +
 			"<label><input type='checkbox' id='chk-update-select' checked/>update-select</label>" +
 			"</div>" +
-			"<div id='st-treeview'></div>";
+			"<div id='st-treeview' style='font-size:10.5pt;'></div>";
 
 		var el = document.getElementById('st-treeview');
 
