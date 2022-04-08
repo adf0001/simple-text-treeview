@@ -12,7 +12,7 @@ var INDEX_INFO_NODE = 0;
 var INDEX_INFO_CHILDREN = 1;
 var INDEX_INFO_CONTAINER = 2;
 
-var DEFAULT_NODE_CONTENT_HTML = "<span class='ht tree-to-expand tree-disable'" +
+var defaultContentHtml = "<span class='ht tree-to-expand tree-disable'" +
 	" style='padding:0em 0.5em;text-decoration:none;font-family:monospace;cursor:default;font-size:inherit;'>" +
 	"." +
 	"</span>" +
@@ -23,6 +23,8 @@ var simpleTextTreeviewClass = function (container) {
 }
 
 simpleTextTreeviewClass.prototype = {
+	defaultContentHtml: defaultContentHtml,
+
 	containerId: null,
 	selectedId: null,		//the selected node id
 
@@ -47,10 +49,13 @@ simpleTextTreeviewClass.prototype = {
 		return ui_model_treeview.nodeName(elNode || this.selectedId);
 	},
 
-	select:function(el){
-		if (this.selectedId) this.getName().classList.remove("selected");
+	select: function (el) {
+		if (this.selectedId) {
+			var elName = this.getName();
+			if (elName) elName.classList.remove("selected");	//the selected may have been removed
+		}
 
-		el=ui_model_treeview.getNode(el);
+		el = ui_model_treeview.getNode(el);
 		htCss.add(ui_model_treeview.nodeName(el), "selected");
 		this.selectedId = ele_id(el);
 	},
@@ -75,7 +80,7 @@ simpleTextTreeviewClass.prototype = {
 					}
 				}
 			}
-			else{
+			else {
 				this.select(el);	//select if the expand-to is disabled
 			}
 		}
@@ -135,7 +140,7 @@ simpleTextTreeviewClass.prototype = {
 			.html
 				text is html
 			.contentHtml
-				content-html to create node, default DEFAULT_NODE_CONTENT_HTML
+				content-html to create node, default 'this.defaultContentHtml'
 				
 	return the first added node
 	*/
@@ -182,7 +187,7 @@ simpleTextTreeviewClass.prototype = {
 		if (options.insert) {
 			//insert dom
 			elNew = ui_model_treeview.addNode(elNode,
-				{ contentHtml: options.contentHtml || DEFAULT_NODE_CONTENT_HTML, insert: true }
+				{ contentHtml: options.contentHtml || this.defaultContentHtml, insert: true }
 			);
 			if (options && options.html)
 				ui_model_treeview.nodeName(elNew).innerHTML = text;
@@ -199,7 +204,7 @@ simpleTextTreeviewClass.prototype = {
 
 			//append dom
 			elNew = ui_model_treeview.addNode(elNode,
-				{ contentHtml: options.contentHtml || DEFAULT_NODE_CONTENT_HTML },
+				{ contentHtml: options.contentHtml || this.defaultContentHtml },
 				isNodeChildren
 			);
 			if (options && options.html)
@@ -351,6 +356,6 @@ exports.INDEX_INFO_NODE = INDEX_INFO_NODE;
 exports.INDEX_INFO_CHILDREN = INDEX_INFO_CHILDREN;
 exports.INDEX_INFO_CONTAINER = INDEX_INFO_CONTAINER;
 
-exports.DEFAULT_NODE_CONTENT_HTML = DEFAULT_NODE_CONTENT_HTML;
+exports.defaultContentHtml = defaultContentHtml;
 
 exports.class = simpleTextTreeviewClass
