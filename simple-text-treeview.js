@@ -24,7 +24,7 @@ var simpleTextTreeviewClass = function (container) {
 
 simpleTextTreeviewClass.prototype = {
 	containerId: null,
-	selectedName: null,		//the selected node name
+	selectedId: null,		//the selected node id
 
 	init: function (container) {
 		container = ele(container);
@@ -41,16 +41,19 @@ simpleTextTreeviewClass.prototype = {
 	},
 
 	getSelected: function () {
-		return this.selectedName && ui_model_treeview.getNode(this.selectedName);
+		return this.selectedId && ui_model_treeview.getNode(this.selectedId);
+	},
+	getName: function (elNode) {
+		return ui_model_treeview.nodeName(elNode || this.selectedId);
 	},
 
 	onClick: function (evt) {
 		var el = evt.target;
 
 		if (el.classList.contains("tree-name")) {
-			if (this.selectedName) this.selectedName.classList.remove("selected");
+			if (this.selectedId) this.getName().classList.remove("selected");
 			htCss.add(el, "selected");
-			this.selectedName = el;
+			this.selectedId = ele_id(el);
 		}
 		else if (el.classList.contains("tree-to-expand") && el.classList.contains("cmd")) {
 			var elChildren = ui_model_treeview.nodeChildren(el.parentNode);
@@ -59,7 +62,7 @@ simpleTextTreeviewClass.prototype = {
 
 				this.updateToExpand(el.parentNode, toShow ? false : true);
 
-				if (!toShow && this.selectedName && elChildren.contains(this.selectedName)) {
+				if (!toShow && this.selectedId && elChildren.contains(this.getSelected())) {
 					//un-select hidden node, and select current
 					this.clickName(el.parentNode);
 				}
@@ -72,7 +75,7 @@ simpleTextTreeviewClass.prototype = {
 
 	//return a NodeInfo, that is, [ elNode, isNodeChildren, isContainer ]
 	getNodeInfo: function (elNode) {
-		if (!elNode) elNode = this.selectedName;
+		if (!elNode) elNode = this.getSelected();
 		else if (elNode instanceof Array) return elNode;		//already a NodeInfo
 		else elNode = ele(elNode);	//ensure an dom element
 
@@ -221,8 +224,8 @@ simpleTextTreeviewClass.prototype = {
 
 	//return false to keep the selected, null or node to change.
 	prepareRemoveSelect: function (elNodeOrChildren, onlyChildren) {
-		if (!this.selectedName) return false;
-		if (!elNodeOrChildren.contains(this.selectedName)) return false;	//don't touch selected even .updateSelect is true
+		if (!this.selectedId) return false;
+		if (!elNodeOrChildren.contains(this.getSelected())) return false;	//don't touch selected even .updateSelect is true
 
 		if (!onlyChildren) {
 			elNodeOrChildren = ui_model_treeview.getNode(elNodeOrChildren);
@@ -233,7 +236,7 @@ simpleTextTreeviewClass.prototype = {
 		if (elNodeOrChildren.id == this.containerId) return null;
 
 		elNodeOrChildren = ui_model_treeview.getNode(elNodeOrChildren);
-		if (this.selectedName === ui_model_treeview.nodeName(elNodeOrChildren)) return false;	//unchanged
+		if (this.getSelected() === ui_model_treeview.getNode(elNodeOrChildren)) return false;	//unchanged
 		return elNodeOrChildren;
 	},
 
@@ -241,10 +244,10 @@ simpleTextTreeviewClass.prototype = {
 		//update select state
 		if (updateSelect) {
 			if (elSelect) this.clickName(elSelect);
-			else if (elSelect === null) this.selectedName = null;	//clean the selected
+			else if (elSelect === null) this.selectedId = null;	//clean the selected
 		}
 		else {
-			if (elSelect !== false) this.selectedName = null;	//clean the selected
+			if (elSelect !== false) this.selectedId = null;	//clean the selected
 		}
 	},
 

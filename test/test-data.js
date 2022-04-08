@@ -55,31 +55,31 @@ module.exports = {
 						
 			return the first added node
 			*/
-			tv.add(tv.selectedName || el, "" + (new Date()),
+			tv.add(tv.selectedId || el, "" + (new Date()),
 				{ updateSelect: _ele('chk-update-select').checked });
 		};
 		document.getElementById('sp-cmd-add-2').onclick = function () {
 			//insert array
-			tv.add(tv.selectedName || el, ["" + (new Date()), "" + (new Date()) + "/<b>2</b>"],
+			tv.add(tv.selectedId || el, ["" + (new Date()), "" + (new Date()) + "/<b>2</b>"],
 				{ updateSelect: _ele('chk-update-select').checked, html: true });
 		};
 		document.getElementById('sp-cmd-insert').onclick = function () {
-			tv.add(tv.selectedName || el, "" + (new Date()),
+			tv.add(tv.selectedId || el, "" + (new Date()),
 				{ insert: true, updateSelect: _ele('chk-update-select').checked });
 		};
 		document.getElementById('sp-cmd-insert-2').onclick = function () {
-			tv.add(tv.selectedName || el, ["" + (new Date()), "" + (new Date()) + "/<b>2</b>"],
+			tv.add(tv.selectedId || el, ["" + (new Date()), "" + (new Date()) + "/<b>2</b>"],
 				{ insert: true, updateSelect: _ele('chk-update-select').checked });
 		};
 		document.getElementById('sp-cmd-insert-next').onclick = function () {
 			//insertNext(elNode, text, options)
-			if (tv.selectedName) tv.insertNext(null, "" + new Date(),
+			if (tv.selectedId) tv.insertNext(null, "" + new Date(),
 				{ updateSelect: _ele('chk-update-select').checked });
 			else tv.add(el, "" + (new Date()),
 				{ updateSelect: _ele('chk-update-select').checked });
 		};
 		document.getElementById('sp-cmd-insert-next-2').onclick = function () {
-			if (tv.selectedName) tv.insertNext(null, ["" + (new Date()), "" + (new Date()) + "/2"],
+			if (tv.selectedId) tv.insertNext(null, ["" + (new Date()), "" + (new Date()) + "/2"],
 				{ updateSelect: _ele('chk-update-select').checked });
 			else tv.add(el, ["" + (new Date()), "" + (new Date()) + "/2"],
 				{ updateSelect: _ele('chk-update-select').checked });
