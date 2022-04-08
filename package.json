@@ -1,6 +1,6 @@
 {
   "name": "simple-text-treeview",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "simple text treeview",
   "main": "simple-text-treeview.js",
   "scripts": {
@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/adf0001/simple-text-treeview#readme",
   "dependencies": {
+    "add-css-text": "^1.0.3",
     "dispatch-event-by-name": "^1.0.4",
     "ele-id": "^1.0.2",
     "get-element-by-id": "^1.0.2",

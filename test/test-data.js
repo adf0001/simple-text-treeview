@@ -1,6 +1,7 @@
 
 //global variable, for html page, refer tpsvr @ npm.
 simple_text_treeview = require("../simple-text-treeview.js");
+add_css_text = require("add-css-text");
 
 module.exports = {
 
@@ -20,7 +21,11 @@ module.exports = {
 			"<span class='ht cmd' id='sp-cmd-remove'>-remove</span> &nbsp; " +
 			"<span class='ht cmd' id='sp-cmd-remove-children'>-remove children</span> &nbsp; " +
 			"<span class='ht cmd' id='sp-cmd-update'>=update</span> &nbsp; " +
-			"<label><input type='checkbox' id='chk-update-select' checked/>update-select</label>" +
+			"<label><input type='checkbox' id='chk-update-select' checked/>update-select</label> &nbsp; " +
+			"<span class='ht cmd' id='sp-cmd-blue'>next blue</span>/" +
+			"<span class='ht cmd' id='sp-cmd-red'>red</span> &nbsp; " +
+			"<span class='ht cmd' id='sp-cmd-bold'>all bold</span>/" +
+			"<span class='ht cmd' id='sp-cmd-bold-not'>-</span> &nbsp; " +
 			"</div>" +
 			"<div id='st-treeview' style='font-size:10.5pt;'></div>";
 
@@ -95,6 +100,19 @@ module.exports = {
 		document.getElementById('sp-cmd-update').onclick = function () {
 			//update(elNode, text, options)
 			tv.update(tv.getSelected(), "" + (new Date()), { updateSelect: _ele('chk-update-select').checked });	//update the selected
+		};
+
+		document.getElementById('sp-cmd-blue').onclick = function () {
+			tv.defaultContentHtml = simple_text_treeview.defaultContentHtml.replace("<span class='tree-name'>", "<span class='tree-name' style='color:blue;'>")
+		};
+		document.getElementById('sp-cmd-red').onclick = function () {
+			tv.defaultContentHtml = simple_text_treeview.defaultContentHtml.replace("<span class='tree-name'>", "<span class='tree-name' style='color:red;'>")
+		};
+		document.getElementById('sp-cmd-bold').onclick = function () {
+			add_css_text(".simple-text-treeview .tree-name{font-weight:bold;}", "simple_text_treeview-test", true);
+		};
+		document.getElementById('sp-cmd-bold-not').onclick = function () {
+			add_css_text(".simple-text-treeview .tree-name{font-weight:normal;}", "simple_text_treeview-test", true);
 		};
 
 		return "ui-test";

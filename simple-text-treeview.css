@@ -1,0 +1,9 @@
+.simple-text-treeview .tree-to-expand {
+	padding: 0em 0.5em;
+	font-family: monospace;
+	cursor: pointer;
+}
+
+.simple-text-treeview .tree-to-expand.tree-disable {
+	cursor: default;
+}

@@ -5,17 +5,16 @@ var ui_model_treeview = require("ui-model-treeview");
 var ele = require("get-element-by-id");
 var ele_id = require("ele-id");
 var dispatch_event_by_name = require("dispatch-event-by-name");
+var add_css_text = require("add-css-text");
 
 var htCss = require("htm-tool-css");	//require ht css
+var css = require("./simple-text-treeview.css");
 
 var INDEX_INFO_NODE = 0;
 var INDEX_INFO_CHILDREN = 1;
 var INDEX_INFO_CONTAINER = 2;
 
-var defaultContentHtml = "<span class='ht tree-to-expand tree-disable'" +
-	" style='padding:0em 0.5em;text-decoration:none;font-family:monospace;cursor:default;font-size:inherit;'>" +
-	"." +
-	"</span>" +
+var defaultContentHtml = "<span class='ht tree-to-expand tree-disable'>.</span>" +
 	"<span class='tree-name'></span>";
 
 var simpleTextTreeviewClass = function (container) {
@@ -29,8 +28,16 @@ simpleTextTreeviewClass.prototype = {
 	selectedId: null,		//the selected node id
 
 	init: function (container) {
+		//load global css only once
+		if (css) {
+			add_css_text(css, "simple-text-treeview-css");
+			css = null;
+		}
+
 		container = ele(container);
+
 		this.containerId = ele_id(container);
+		container.classList.add("simple-text-treeview");
 
 		container.onclick = this._onClick || (this._onClick = this.onClick.bind(this));
 	},
@@ -67,7 +74,7 @@ simpleTextTreeviewClass.prototype = {
 			this.select(el);
 		}
 		else if (el.classList.contains("tree-to-expand")) {
-			if (el.classList.contains("cmd")) {
+			if (el.classList.contains("hover")) {
 				var elChildren = ui_model_treeview.nodeChildren(el.parentNode);
 				if (elChildren && elChildren.hasChildNodes()) {
 					var toShow = (elChildren.style.display == "none");
@@ -114,7 +121,7 @@ simpleTextTreeviewClass.prototype = {
 		ui_model_treeview.setToExpandState(elNode, state);
 
 		var el = ui_model_treeview.nodeToExpand(elNode);
-		(state === "disable") ? htCss.remove(el, "cmd") : htCss.add(el, "cmd");
+		(state === "disable") ? htCss.remove(el, "hover") : htCss.add(el, "hover");
 
 		if (state === "disable" || !state) {	//state is false or disable
 			el = ui_model_treeview.nodeChildren(elNode);
