@@ -47,25 +47,36 @@ simpleTextTreeviewClass.prototype = {
 		return ui_model_treeview.nodeName(elNode || this.selectedId);
 	},
 
+	select:function(el){
+		if (this.selectedId) this.getName().classList.remove("selected");
+
+		el=ui_model_treeview.getNode(el);
+		htCss.add(ui_model_treeview.nodeName(el), "selected");
+		this.selectedId = ele_id(el);
+	},
+
 	onClick: function (evt) {
 		var el = evt.target;
 
 		if (el.classList.contains("tree-name")) {
-			if (this.selectedId) this.getName().classList.remove("selected");
-			htCss.add(el, "selected");
-			this.selectedId = ele_id(el);
+			this.select(el);
 		}
-		else if (el.classList.contains("tree-to-expand") && el.classList.contains("cmd")) {
-			var elChildren = ui_model_treeview.nodeChildren(el.parentNode);
-			if (elChildren && elChildren.hasChildNodes()) {
-				var toShow = (elChildren.style.display == "none");
+		else if (el.classList.contains("tree-to-expand")) {
+			if (el.classList.contains("cmd")) {
+				var elChildren = ui_model_treeview.nodeChildren(el.parentNode);
+				if (elChildren && elChildren.hasChildNodes()) {
+					var toShow = (elChildren.style.display == "none");
 
-				this.updateToExpand(el.parentNode, toShow ? false : true);
+					this.updateToExpand(el.parentNode, toShow ? false : true);
 
-				if (!toShow && this.selectedId && elChildren.contains(this.getSelected())) {
-					//un-select hidden node, and select current
-					this.clickName(el.parentNode);
+					if (!toShow && this.selectedId && elChildren.contains(this.getSelected())) {
+						//un-select hidden node, and select current
+						this.clickName(el.parentNode);
+					}
 				}
+			}
+			else{
+				this.select(el);	//select if the expand-to is disabled
 			}
 		}
 	},
