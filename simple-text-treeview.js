@@ -275,7 +275,8 @@ simpleTextTreeviewClass.prototype = {
 	},
 
 	//return true if finished
-	//options.onlyChildren:	set true for removing only the children, not the elNode itself;
+	//options.onlyChildren:	set true to remove only the children, not the elNode itself;
+	//options.keepEmptyChildren: set true keep empty children;
 	remove: function (elNode, options) {
 		//arguments
 		var onlyChildren = options && options.onlyChildren;
@@ -313,8 +314,10 @@ simpleTextTreeviewClass.prototype = {
 			this.updateToExpand(elParent, "disable");
 
 			//remove empty parent children
-			var elChildren = ui_model_treeview.nodeChildren(elParent);
-			elChildren.parentNode.removeChild(elChildren);
+			if (!(options && options.keepEmptyChildren)) {
+				var elChildren = ui_model_treeview.nodeChildren(elParent);
+				elChildren.parentNode.removeChild(elChildren);
+			}
 		}
 
 		//update select state

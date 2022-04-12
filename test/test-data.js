@@ -26,6 +26,7 @@ module.exports = {
 			"<span class='ht cmd' id='sp-cmd-red'>red</span> &nbsp; " +
 			"<span class='ht cmd' id='sp-cmd-bold'>all bold</span>/" +
 			"<span class='ht cmd' id='sp-cmd-bold-not'>-</span> &nbsp; " +
+			"<label><input type='checkbox' id='chk-keep-empty-children'/>keep empty children</label> &nbsp; " +
 			"</div>" +
 			"<div id='st-treeview' style='font-size:10.5pt;'></div>";
 
@@ -91,11 +92,21 @@ module.exports = {
 		};
 		document.getElementById('sp-cmd-remove').onclick = function () {
 			//remove(elNode, options)
-			tv.remove(null, { updateSelect: _ele('chk-update-select').checked });	//remove the selected
+			tv.remove(null,		//remove the selected
+				{
+					updateSelect: _ele('chk-update-select').checked,
+					keepEmptyChildren: _ele('chk-keep-empty-children').checked,
+				}
+			);
 		};
 		document.getElementById('sp-cmd-remove-children').onclick = function () {
 			//removeAllChildren(elNode, options)
-			tv.removeAllChildren(null, { updateSelect: _ele('chk-update-select').checked });	//remove all children of the selected
+			tv.removeAllChildren(null,		//remove all children of the selected
+				{
+					updateSelect: _ele('chk-update-select').checked,
+					keepEmptyChildren: _ele('chk-keep-empty-children').checked,
+				}
+			);
 		};
 		document.getElementById('sp-cmd-update').onclick = function () {
 			//update(elNode, text, options)
